@@ -24,7 +24,7 @@ runs:
         GH_TOKEN: ${{ github.token }}
         PR_NUMBER: ${{ github.event.pull_request.number }}   
       shell: bash
-      run: echo "COMMITS=${gh pr view ${PR_NUMBER} --json commits}"
+      run: echo "COMMITS=$(gh pr view ${PR_NUMBER} --json commits)" >> $GITHUB_ENV
     - name: echo
       env:
         COMMITS: ${{ env.COMMITS }}
