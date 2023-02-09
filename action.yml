@@ -45,7 +45,7 @@ runs:
         CLOSED_AT: ${{ env.CLOSED_AT }}
       shell: bash
       run: |
-        $(deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}") > new_body.md
+        deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}" > new_body.md
     - name: update body
       env:
         GH_TOKEN: ${{ github.token }}
