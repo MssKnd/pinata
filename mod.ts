@@ -40,4 +40,4 @@ function commandLineArgument() {
 
 const obj = commandLineArgument();
 
-console.log(`NEW_BODY=${obj.body}\n${obj.createdAt}\n${obj.closedAt}\n${obj.commits}`);
+console.log(`NEW_BODY=${obj.body}\nedit`);
