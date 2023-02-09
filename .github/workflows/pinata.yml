@@ -1,0 +1,8 @@
+name: pinata
+on: pull_request
+jobs:
+  check_and_comment:
+    runs-on: ubuntu-latest
+    steps:
+      - name: pinata
+        uses: ./action.yml

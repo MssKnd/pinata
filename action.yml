@@ -1,0 +1,33 @@
+name: pinata
+author: mssknd
+description: This repository contains a GitHub Action that transforms cycle time data from your pull request into a colorful and easily understandable chart.
+branding:
+  icon: file-text
+  color: orange
+inputs:
+  BASE_BRANCH:
+    description: 'Base branch name (default: main)'
+    default: 'main'
+  MARKDOWN_DIR:
+    default: '*'
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: v1.x
+    - name: get commits data
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}   
+      shell: bash
+      run: echo "COMMITS=${gh pr view ${PR_NUMBER} --json commits}"
+    - name: echo
+      env:
+        COMMITS: ${{ env.COMMITS }}
+      shell: bash
+      run: echo "${COMMITS}"
+
