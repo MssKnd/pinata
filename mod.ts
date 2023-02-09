@@ -1,5 +1,8 @@
 import { parse } from "https://deno.land/std@0.177.0/flags/mod.ts";
-import { isObject, isString } from "https://deno.land/x/documentaly/utilities/type-guard.ts"
+import {
+  isObject,
+  isString,
+} from "https://deno.land/x/documentaly/utilities/type-guard.ts";
 
 function validateCommandLineArgument(input: unknown) {
   if (
@@ -9,11 +12,17 @@ function validateCommandLineArgument(input: unknown) {
   }
 
   return {
-    body: 'body' in input && isString(input.body) ? input.body : null,
-    commits: 'commits' in input && isString(input.commits) ? JSON.parse(input.commits) : [],
-    createdAt: 'createdAt' in input && isString(input.createdAt) ? new Date(input.createdAt): null,
-    closedAt: 'closedAt' in input && isString(input.closedAt) ? new Date(input.closedAt): null,
-  }
+    body: "body" in input && isString(input.body) ? input.body : null,
+    commits: "commits" in input && isString(input.commits)
+      ? JSON.parse(input.commits)
+      : [],
+    createdAt: "createdAt" in input && isString(input.createdAt)
+      ? new Date(input.createdAt)
+      : null,
+    closedAt: "closedAt" in input && isString(input.closedAt)
+      ? new Date(input.closedAt)
+      : null,
+  };
 }
 
 function commandLineArgument() {
@@ -22,11 +31,11 @@ function commandLineArgument() {
       b: "body",
       c: "commits",
       a: "createdAt",
-      z: "closedAt"
+      z: "closedAt",
     },
   }));
 }
 
-const obj = commandLineArgument()
+const obj = commandLineArgument();
 
-console.log(`${obj.body}\n${obj.createdAt}\n${obj.closedAt}\n${obj.commits}`)
+console.log(`${obj.body}\n${obj.createdAt}\n${obj.closedAt}\n${obj.commits}`);
