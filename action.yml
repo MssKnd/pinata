@@ -46,13 +46,16 @@ runs:
       shell: bash
       run: |
         deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}" > new_body.md
+        ls -la
         cat new_body.md
         echo "NEW_BODY=$(cat new_body.md)" >> $GITHUB_ENV
-    - name: echo
+    - name: update body
       env:
         GH_TOKEN: ${{ github.token }}
         PR_NUMBER: ${{ github.event.pull_request.number }}  
         NEW_BODY: ${{ env.NEW_BODY }}
       shell: bash
-      run: gh pr edit ${PR_NUMBER} -b "${NEW_BODY}"
+      run: |
+        echo ${NEW_BODY}
+        gh pr edit ${PR_NUMBER} -b "${NEW_BODY}"
 
