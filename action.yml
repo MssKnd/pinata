@@ -44,7 +44,13 @@ runs:
         CREATED_AT: ${{ env.CREATED_AT }}
         CLOSED_AT: ${{ env.CLOSED_AT }}
       shell: bash
-      run: deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}" >> $GITHUB_ENV
+      run: |
+        cat << EOF
+        $(deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}")
+        EOF > new_body.md
+        ls -la
+        cat new_body.md
+        echo "NEW_BODY=$(cat new_body.md)" >> $GITHUB_ENV
     - name: update body
       env:
         GH_TOKEN: ${{ github.token }}

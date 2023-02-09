@@ -40,4 +40,4 @@ function commandLineArgument() {
 
 const obj = commandLineArgument();
 
-console.log(`NEW_BODY=${obj.body}\nedit`);
+console.log(`${obj.body}\nedit`);
