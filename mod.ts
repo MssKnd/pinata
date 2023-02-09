@@ -4,6 +4,8 @@ import {
   isString,
 } from "https://deno.land/x/documentaly/utilities/type-guard.ts";
 
+const isValidDate = (date: Date) => !Number.isNaN(date.getTime());
+
 function validateCommandLineArgument(input: unknown) {
   if (
     !isObject(input) || !("_" in input) || !Array.isArray(input._)
@@ -16,12 +18,8 @@ function validateCommandLineArgument(input: unknown) {
     commits: "commits" in input && isString(input.commits)
       ? JSON.parse(input.commits)
       : [],
-    createdAt: "createdAt" in input && isString(input.createdAt)
-      ? new Date(input.createdAt)
-      : null,
-    closedAt: "closedAt" in input && isString(input.closedAt)
-      ? new Date(input.closedAt)
-      : null,
+    createdAt: "createdAt" in input && isValidDate(new Date(input.createdAt)) ? new Date(input.createdAt) : null,
+    closedAt: "closedAt" in input && isValidDate(new Date(input.closedAt)) ? new Date(input.closedAt) : null,
   };
 }
 
