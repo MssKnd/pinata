@@ -45,7 +45,12 @@ runs:
         CLOSED_AT: ${{ env.CLOSED_AT }}
       shell: bash
       run: >
-        echo "NEW_BODY=$(deno run -A mod.ts)" >> $GITHUB_ENV
+        echo "NEW_BODY=$(deno run -A mod.ts
+          -b ${BODY}
+          -c ${COMMITS}
+          -a ${CREATED_AT}
+          -z ${CLOSED_AT}
+        )" >> $GITHUB_ENV
     - name: echo
       env:
         GH_TOKEN: ${{ github.token }}

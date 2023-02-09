@@ -1,1 +1,32 @@
-console.log('new body')
+import { parse } from "https://deno.land/std@0.177.0/flags/mod.ts";
+import { isObject, isString } from "https://deno.land/x/documentaly/utilities/type-guard.ts"
+
+function validateCommandLineArgument(input: unknown) {
+  if (
+    !isObject(input) || !("_" in input) || !Array.isArray(input._)
+  ) {
+    throw new Error("invalid argument");
+  }
+
+  return {
+    body: 'body' in input && isString(input.body) ? input.body : null,
+    commits: 'commits' in input && isString(input.commits) ? JSON.parse(input.commits) : [],
+    createdAt: 'createdAt' in input && isString(input.createdAt) ? new Date(input.createdAt): null,
+    closedAt: 'closedAt' in input && isString(input.closedAt) ? new Date(input.closedAt): null,
+  }
+}
+
+function commandLineArgument() {
+  return validateCommandLineArgument(parse(Deno.args, {
+    alias: {
+      b: "body",
+      c: "commits",
+      a: "createdAt",
+      z: "closedAt"
+    },
+  }));
+}
+
+const obj = commandLineArgument()
+
+console.log(`${obj.body}\n${obj.createdAt}\n${obj.closedAt}\n${obj.commits}`)
