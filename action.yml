@@ -4,12 +4,6 @@ description: This repository contains a GitHub Action that transforms cycle time
 branding:
   icon: file-text
   color: orange
-inputs:
-  BASE_BRANCH:
-    description: 'Base branch name (default: main)'
-    default: 'main'
-  MARKDOWN_DIR:
-    default: '*'
 runs:
   using: composite
   steps:
@@ -58,5 +52,5 @@ runs:
         PR_NUMBER: ${{ github.event.pull_request.number }}  
         NEW_BODY: ${{ env.NEW_BODY }}
       shell: bash
-      run: gh pr edit ${PR_NUMBER} -b ${NEW_BODY}
+      run: gh pr edit ${PR_NUMBER} -b "${NEW_BODY}"
 
