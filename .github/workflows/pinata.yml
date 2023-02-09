@@ -4,5 +4,6 @@ jobs:
   check_and_comment:
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v3
       - name: pinata
         uses: ./
