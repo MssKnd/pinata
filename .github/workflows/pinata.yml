@@ -1,7 +1,7 @@
 name: pinata
 on: pull_request
 permissions:
-  issue: write
+  issues: write
 jobs:
   check_and_comment:
     runs-on: ubuntu-latest
