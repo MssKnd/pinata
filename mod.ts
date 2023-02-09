@@ -18,8 +18,12 @@ function validateCommandLineArgument(input: unknown) {
     commits: "commits" in input && isString(input.commits)
       ? JSON.parse(input.commits)
       : [],
-    createdAt: "createdAt" in input && isValidDate(new Date(input.createdAt)) ? new Date(input.createdAt) : null,
-    closedAt: "closedAt" in input && isValidDate(new Date(input.closedAt)) ? new Date(input.closedAt) : null,
+    createdAt: "createdAt" in input && isValidDate(new Date(input.createdAt))
+      ? new Date(input.createdAt)
+      : null,
+    closedAt: "closedAt" in input && isValidDate(new Date(input.closedAt))
+      ? new Date(input.closedAt)
+      : null,
   };
 }
 
