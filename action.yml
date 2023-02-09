@@ -38,5 +38,5 @@ runs:
         COMMITS: ${{ env.COMMITS }}
         BODY: ${{ env.BODY }}
       shell: bash
-      run: gh pr edit ${PR_NUMBER} -b ${COMMITS}
+      run: gh pr edit ${PR_NUMBER} -b tttttttest
 
