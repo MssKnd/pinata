@@ -45,19 +45,12 @@ runs:
         CLOSED_AT: ${{ env.CLOSED_AT }}
       shell: bash
       run: |
-        cat << EOF
-        $(deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}")
-        EOF > new_body.md
-        ls -la
-        cat new_body.md
-        echo "NEW_BODY=$(cat new_body.md)" >> $GITHUB_ENV
+        $(deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}") > new_body.md
     - name: update body
       env:
         GH_TOKEN: ${{ github.token }}
         PR_NUMBER: ${{ github.event.pull_request.number }}  
         NEW_BODY: ${{ env.NEW_BODY }}
       shell: bash
-      run: |
-        echo ${NEW_BODY}
-        gh pr edit ${PR_NUMBER} -b "${NEW_BODY}"
+      run: gh pr edit ${PR_NUMBER} -F ./new_body.md
 
