@@ -1,0 +1,56 @@
+name: pinata
+author: mssknd
+description: This repository contains a GitHub Action that transforms cycle time data from your pull request into a colorful and easily understandable chart.
+branding:
+  icon: file-text
+  color: orange
+runs:
+  using: composite
+  steps:
+    - name: Checkout
+      uses: actions/checkout@v3
+    - name: Setup deno
+      uses: denoland/setup-deno@v1
+      with:
+        deno-version: v1.x
+    - name: get pull-request body
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}   
+      shell: bash
+      run: echo "BODY=$(gh pr view ${PR_NUMBER} --json body)" >> $GITHUB_ENV
+    - name: get commits data
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}   
+      shell: bash
+      run: echo "COMMITS=$(gh pr view ${PR_NUMBER} --json commits)" >> $GITHUB_ENV
+    - name: get pull-request createdAt
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}   
+      shell: bash
+      run: echo "CREATED_AT=$(gh pr view ${PR_NUMBER} --json createdAt)" >> $GITHUB_ENV
+    - name: get pull-request closedAt
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}   
+      shell: bash
+      run: echo "CLOSED_AT=$(gh pr view ${PR_NUMBER} --json closedAt)" >> $GITHUB_ENV
+    - name: create new body
+      env: 
+        BODY: ${{ env.BODY }}
+        COMMITS: ${{ env.COMMITS }}
+        CREATED_AT: ${{ env.CREATED_AT }}
+        CLOSED_AT: ${{ env.CLOSED_AT }}
+      shell: bash
+      run: |
+        deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}" > new_body.md
+    - name: update body
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}  
+        NEW_BODY: ${{ env.NEW_BODY }}
+      shell: bash
+      run: gh pr edit ${PR_NUMBER} -F ./new_body.md
+
