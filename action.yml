@@ -6,8 +6,8 @@ branding:
   color: orange
 inputs:
   FORMAT:
-    description: 'Datetime format (default: yyyy-MM-dd hh:mm:ss)'
-    default: yyyy-MM-dd hh:mm:ss
+    description: 'Datetime format (default: MM-dd hh:mm)'
+    default: MM-dd hh:mm
 runs:
   using: composite
   steps:
