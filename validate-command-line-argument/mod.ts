@@ -28,7 +28,7 @@ function validateCommandLineArgument(input: unknown) {
   const datetimeFormat =
     "datetimeFormat" in input && isString(input.datetimeFormat)
       ? input.datetimeFormat
-      : "yyyy-MM-dd hh:mm:ss";
+      : "MM-dd hh:mm";
 
   return {
     body,
