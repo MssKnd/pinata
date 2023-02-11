@@ -55,7 +55,7 @@ runs:
         CLOSED_AT: ${{ env.CLOSED_AT }}
         REVIEWS: ${{ env.REVIEWS }}
       shell: bash
-      run: |
+      run: >
         deno run -A mod.ts
         -b "${BODY}"
         -c "${COMMITS}"
