@@ -1,11 +1,7 @@
-import {
-  isObject,
-  isString,
-} from "https://deno.land/x/documentaly/utilities/type-guard.ts";
+import { isObject, isString } from "../deps.ts";
 import { extractPropFromUnknownJson } from "./extract-prop-from-unknown-json/mod.ts";
 
 const isValidDate = (date: Date) => !Number.isNaN(date.getTime());
-
 
 function validateCommandLineArgument(input: unknown) {
   if (
@@ -26,16 +22,17 @@ function validateCommandLineArgument(input: unknown) {
   const closedAt = "closedAt" in input
     ? extractPropFromUnknownJson(input.closedAt, "closedAt", isString) ?? ""
     : "";
-  const reviews = "reviews" in input ? extractPropFromUnknownJson(input.reviews, "reviews", isString) ?? ""
-  : "";
+  const reviews = "reviews" in input
+    ? extractPropFromUnknownJson(input.reviews, "reviews", Array.isArray) ?? []
+    : [];
 
   return {
     body,
     commits,
     createdAt: isValidDate(new Date(createdAt)) ? new Date(createdAt) : null,
     closedAt: isValidDate(new Date(closedAt)) ? new Date(closedAt) : null,
-    reviews:
+    reviews,
   };
 }
 
-export {validateCommandLineArgument}
+export { validateCommandLineArgument };

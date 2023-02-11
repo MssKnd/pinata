@@ -1,7 +1,4 @@
-import {
-  isObject,
-  isString,
-} from "https://deno.land/x/documentaly/utilities/type-guard.ts";
+import { isObject, isString } from "../../deps.ts";
 
 const extractPropFromUnknownJson = <T>(
   json: unknown,
@@ -23,4 +20,4 @@ const extractPropFromUnknownJson = <T>(
   return jsonObject[propName] as T;
 };
 
-export {extractPropFromUnknownJson}
+export { extractPropFromUnknownJson };

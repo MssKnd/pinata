@@ -1,5 +1,6 @@
 import { parse } from "https://deno.land/std@0.177.0/flags/mod.ts";
-import { isObject, isString } from "https://deno.land/x/documentaly/utilities/type-guard.ts";
+import { extractFirstAndApproveReview } from "./extruct-approved-at/mod.ts";
+import { extractFirstCommit } from "./extruct-first-commit/mod.ts";
 import { validateCommandLineArgument } from "./validate-command-line-argument/mod.ts";
 
 function commandLineArgument() {
@@ -9,6 +10,7 @@ function commandLineArgument() {
       c: "commits",
       a: "createdAt",
       z: "closedAt",
+      r: "reviews",
     },
   }));
 }
@@ -21,47 +23,61 @@ const {
   reviews,
 } = commandLineArgument();
 
-function extractFirstCommit(commits: unknown[]) {
-  const [firstCommit] = commits;
-  if (!firstCommit || !isObject(firstCommit)) {
-    return null
+const firstCommit = extractFirstCommit(commits);
+const {
+  firstReview,
+  approveReview,
+} = extractFirstAndApproveReview(reviews);
+
+const createDuration = createdAt && firstCommit
+  ? `${createdAt?.getTime() - firstCommit.committedDate.getTime()}h`
+  : "-";
+const firstReviewDuration = firstReview && firstCommit
+  ? `${
+    firstReview.submittedAt.getTime() - firstCommit.committedDate.getTime()
+  }h`
+  : "-";
+const approveDuration = approveReview && (firstReview || firstCommit)
+  ? `${
+    approveReview.submittedAt.getTime() -
+    (firstReview.submittedAt ?? firstCommit?.committedDate).getTime()
+  }h`
+  : "-";
+const closeDuration = closedAt && (approveReview || firstReview || firstCommit)
+  ? `${
+    closedAt.getTime() -
+    (approveReview?.submittedAt ?? firstReview?.submittedAt ??
+      firstCommit?.committedDate)!.getTime()
+  }h`
+  : "-";
+
+const resultBody =
+  `| index | datetime | duration |\n| ----- | -------- | -------- |
+${
+    firstCommit
+      ? `| First commit | ${firstCommit?.committedDate.toISOString()} | - |`
+      : ""
   }
-  if (
-    !('committedDate' in firstCommit) || !isString(firstCommit.committedDate) ||
-    !('authors' in firstCommit) || !Array.isArray(firstCommit.authors)
-  ) {
-    return null
+${
+    createdAt
+      ? `| PR opened | ${createdAt?.toISOString()} | ${createDuration} |`
+      : ""
   }
-  return {
-    committedDate: new Date(firstCommit.committedDate),
-    authors: firstCommit.authors,
+${
+    firstReview
+      ? `| PR first review | ${firstReview.submittedAt.toISOString()} | ${firstReviewDuration} |`
+      : ""
   }
-}
-
-
-const firstCommit = extractFirstCommit(commits)
-
-const createDuration = firstCommit && createdAt ? `${firstCommit.committedDate.getTime() - createdAt?.getTime()}h` : null;
-// const approvedDuration = `h`;
-const closedDuration = `h`;
-
-
-const resultBody = `| index | datetime | duration |\n| ----- | -------- | -------- |
-${firstCommit ? `| First commit | ${firstCommit?.committedDate.toISOString()} | - |` : ""}
-${createdAt ? `| PR opened | ${createdAt?.toISOString()} | ${createDuration} |` : ""}
-${closedAt ? `| PR Closed | ${closedAt?.toISOString()} | ${closedDuration} |` : ""}
-${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
-// | Approved     | ${
-//   new Date(firstCommittedDate).toISOString()
-// } | ${approvedDuration}    |
-
-console.log({
-  firstCommittedAt: firstCommit?.committedDate,
-  createdAt,
-  closedAt,
-  createDuration,
-  resultBody,
-});
+${
+    approveReview
+      ? `| PR approved | ${approveReview.submittedAt.toISOString()} | ${approveDuration} |`
+      : ""
+  }
+${
+    closedAt
+      ? `| PR closed | ${closedAt?.toISOString()} | ${closeDuration} |`
+      : ""
+  }${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
 
 const commentWrapdBody =
   `<!-- pinata: start -->\n${resultBody}\n<!-- pinata: end -->`;
