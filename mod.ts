@@ -1,19 +1,7 @@
-import { parse } from "https://deno.land/std@0.177.0/flags/mod.ts";
+import { format } from "https://deno.land/std@0.177.0/datetime/mod.ts";
+import { commandLineArgument } from "./command-line-argument/mod.ts";
 import { extractFirstAndApproveReview } from "./extruct-approved-at/mod.ts";
 import { extractFirstCommit } from "./extruct-first-commit/mod.ts";
-import { validateCommandLineArgument } from "./validate-command-line-argument/mod.ts";
-
-function commandLineArgument() {
-  return validateCommandLineArgument(parse(Deno.args, {
-    alias: {
-      b: "body",
-      c: "commits",
-      a: "createdAt",
-      z: "closedAt",
-      r: "reviews",
-    },
-  }));
-}
 
 const {
   commits,
@@ -21,6 +9,7 @@ const {
   closedAt,
   body,
   reviews,
+  datetimeFormat,
 } = commandLineArgument();
 
 const firstCommit = extractFirstCommit(commits);
@@ -51,32 +40,40 @@ const closeDuration = closedAt && (approveReview || firstReview || firstCommit)
         firstCommit?.committedDate)!.getTime()) / 1000
   }s`
   : "-";
-
+console.log(datetimeFormat);
 const resultBody =
   `| index | datetime | duration |\n| ----- | -------- | -------- |
 ${
     firstCommit
-      ? `| First commit | ${firstCommit?.committedDate.toISOString()} | - |`
+      ? `| First commit | ${
+        format(firstCommit.committedDate, datetimeFormat)
+      } | - |`
       : ""
   }
 ${
     createdAt
-      ? `| PR opened | ${createdAt?.toISOString()} | ${createDuration} |`
+      ? `| PR opened | ${
+        format(createdAt, datetimeFormat)
+      } | ${createDuration} |`
       : ""
   }
 ${
     firstReview
-      ? `| PR first review | ${firstReview.submittedAt.toISOString()} | ${firstReviewDuration} |`
+      ? `| PR first review | ${
+        format(firstReview.submittedAt, datetimeFormat)
+      } | ${firstReviewDuration} |`
       : ""
   }
 ${
     approveReview
-      ? `| PR approved | ${approveReview.submittedAt.toISOString()} | ${approveDuration} |`
+      ? `| PR approved | ${
+        format(approveReview.submittedAt, datetimeFormat)
+      } | ${approveDuration} |`
       : ""
   }
 ${
     closedAt
-      ? `| PR closed | ${closedAt?.toISOString()} | ${closeDuration} |`
+      ? `| PR closed | ${format(closedAt, datetimeFormat)} | ${closeDuration} |`
       : ""
   }${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
 

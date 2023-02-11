@@ -25,6 +25,10 @@ function validateCommandLineArgument(input: unknown) {
   const reviews = "reviews" in input
     ? extractPropFromUnknownJson(input.reviews, "reviews", Array.isArray) ?? []
     : [];
+  const datetimeFormat =
+    "datetimeFormat" in input && isString(input.datetimeFormat)
+      ? input.datetimeFormat
+      : "yyyy-MM-dd hh:mm:ss";
 
   return {
     body,
@@ -32,6 +36,7 @@ function validateCommandLineArgument(input: unknown) {
     createdAt: isValidDate(new Date(createdAt)) ? new Date(createdAt) : null,
     closedAt: isValidDate(new Date(closedAt)) ? new Date(closedAt) : null,
     reviews,
+    datetimeFormat,
   };
 }
 
