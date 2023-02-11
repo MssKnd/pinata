@@ -1,31 +1,7 @@
 import { parse } from "https://deno.land/std@0.177.0/flags/mod.ts";
-import {
-  isObject,
-  isString,
-} from "https://deno.land/x/documentaly/utilities/type-guard.ts";
-
-const isValidDate = (date: Date) => !Number.isNaN(date.getTime());
-
-function validateCommandLineArgument(input: unknown) {
-  if (
-    !isObject(input) || !("_" in input) || !Array.isArray(input._)
-  ) {
-    throw new Error("invalid argument");
-  }
-
-  return {
-    body: "body" in input && isString(input.body) ? input.body : null,
-    commits: "commits" in input && isString(input.commits)
-      ? JSON.parse(input.commits)
-      : [],
-    createdAt: "createdAt" in input && isValidDate(new Date(input.createdAt))
-      ? new Date(input.createdAt)
-      : null,
-    closedAt: "closedAt" in input && isValidDate(new Date(input.closedAt))
-      ? new Date(input.closedAt)
-      : null,
-  };
-}
+import { extractFirstAndApproveReview } from "./extruct-approved-at/mod.ts";
+import { extractFirstCommit } from "./extruct-first-commit/mod.ts";
+import { validateCommandLineArgument } from "./validate-command-line-argument/mod.ts";
 
 function commandLineArgument() {
   return validateCommandLineArgument(parse(Deno.args, {
@@ -34,10 +10,87 @@ function commandLineArgument() {
       c: "commits",
       a: "createdAt",
       z: "closedAt",
+      r: "reviews",
     },
   }));
 }
 
-const obj = commandLineArgument();
+const {
+  commits,
+  createdAt,
+  closedAt,
+  body,
+  reviews,
+} = commandLineArgument();
 
-console.log(`${obj.body}\n${obj.createdAt}\n${obj.commits[0]}`);
+const firstCommit = extractFirstCommit(commits);
+const {
+  firstReview,
+  approveReview,
+} = extractFirstAndApproveReview(reviews);
+
+const createDuration = createdAt && firstCommit
+  ? `${(createdAt?.getTime() - firstCommit.committedDate.getTime()) / 1000}s`
+  : "-";
+const firstReviewDuration = firstReview && firstCommit
+  ? `${
+    (firstReview.submittedAt.getTime() - firstCommit.committedDate.getTime()) /
+    1000
+  }s`
+  : "-";
+const approveDuration = approveReview && (firstReview || firstCommit)
+  ? `${
+    approveReview.submittedAt.getTime() -
+    ((firstReview.submittedAt ?? firstCommit?.committedDate).getTime()) / 1000
+  }s`
+  : "-";
+const closeDuration = closedAt && (approveReview || firstReview || firstCommit)
+  ? `${
+    closedAt.getTime() -
+    ((approveReview?.submittedAt ?? firstReview?.submittedAt ??
+        firstCommit?.committedDate)!.getTime()) / 1000
+  }s`
+  : "-";
+
+const resultBody =
+  `| index | datetime | duration |\n| ----- | -------- | -------- |
+${
+    firstCommit
+      ? `| First commit | ${firstCommit?.committedDate.toISOString()} | - |`
+      : ""
+  }
+${
+    createdAt
+      ? `| PR opened | ${createdAt?.toISOString()} | ${createDuration} |`
+      : ""
+  }
+${
+    firstReview
+      ? `| PR first review | ${firstReview.submittedAt.toISOString()} | ${firstReviewDuration} |`
+      : ""
+  }
+${
+    approveReview
+      ? `| PR approved | ${approveReview.submittedAt.toISOString()} | ${approveDuration} |`
+      : ""
+  }
+${
+    closedAt
+      ? `| PR closed | ${closedAt?.toISOString()} | ${closeDuration} |`
+      : ""
+  }${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
+
+const commentWrapdBody =
+  `<!-- pinata: start -->\n${resultBody}\n<!-- pinata: end -->`;
+
+const regExp = /<!--\s*pinata:\s*start\s*-->(.*?)<!--\s*pinata:\s*end\s*-->/gms;
+
+if (body?.match(regExp)) {
+  const replacedBody = body?.replace(
+    /<!--\s*pinata:\s*start\s*-->(.*?)<!--\s*pinata:\s*end\s*-->/gms,
+    (_, __) => commentWrapdBody,
+  );
+  console.log(`${replacedBody}`);
+} else {
+  console.log(`${body}\n${commentWrapdBody}`);
+}

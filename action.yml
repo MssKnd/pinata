@@ -37,15 +37,22 @@ runs:
         PR_NUMBER: ${{ github.event.pull_request.number }}   
       shell: bash
       run: echo "CLOSED_AT=$(gh pr view ${PR_NUMBER} --json closedAt)" >> $GITHUB_ENV
+    - name: get pull-request reviews
+      env:
+        GH_TOKEN: ${{ github.token }}
+        PR_NUMBER: ${{ github.event.pull_request.number }}   
+      shell: bash
+      run: echo "REVIEWS=$(gh pr view ${PR_NUMBER} --json reviews)" >> $GITHUB_ENV
     - name: create new body
       env: 
         BODY: ${{ env.BODY }}
         COMMITS: ${{ env.COMMITS }}
         CREATED_AT: ${{ env.CREATED_AT }}
         CLOSED_AT: ${{ env.CLOSED_AT }}
+        REVIEWS: ${{ env.REVIEWS }}
       shell: bash
       run: |
-        deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}" > new_body.md
+        deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}" -r "${REVIEWS}" > new_body.md
     - name: update body
       env:
         GH_TOKEN: ${{ github.token }}
