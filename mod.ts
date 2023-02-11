@@ -1,4 +1,7 @@
-import { format } from "https://deno.land/std@0.177.0/datetime/mod.ts";
+import {
+  difference,
+  format,
+} from "https://deno.land/std@0.177.0/datetime/mod.ts";
 import { commandLineArgument } from "./command-line-argument/mod.ts";
 import { extractFirstAndApproveReview } from "./extruct-approved-at/mod.ts";
 import { extractFirstCommit } from "./extruct-first-commit/mod.ts";
@@ -19,30 +22,30 @@ const {
 } = extractFirstAndApproveReview(reviews);
 
 const createDuration = createdAt && firstCommit
-  ? `${(createdAt?.getTime() - firstCommit.committedDate.getTime()) / 1000}s`
+  ? `${difference(firstCommit.committedDate, createdAt).minutes}m`
   : "-";
 const firstReviewDuration = firstReview && firstCommit
-  ? `${
-    (firstReview.submittedAt.getTime() - firstCommit.committedDate.getTime()) /
-    1000
-  }s`
+  ? `${difference(firstCommit.committedDate, firstReview.submittedAt).minutes}m`
   : "-";
 const approveDuration = approveReview && (firstReview || firstCommit)
   ? `${
-    approveReview.submittedAt.getTime() -
-    ((firstReview.submittedAt ?? firstCommit?.committedDate).getTime()) / 1000
-  }s`
+    difference(
+      firstReview?.submittedAt ?? firstCommit!.committedDate,
+      approveReview.submittedAt,
+    ).minutes
+  }m`
   : "-";
 const closeDuration = closedAt && (approveReview || firstReview || firstCommit)
   ? `${
-    closedAt.getTime() -
-    ((approveReview?.submittedAt ?? firstReview?.submittedAt ??
-        firstCommit?.committedDate)!.getTime()) / 1000
-  }s`
+    difference(
+      approveReview?.submittedAt ?? firstReview?.submittedAt ??
+        firstCommit!.committedDate,
+      closedAt,
+    ).minutes
+  }m`
   : "-";
-console.log(datetimeFormat);
 const resultBody =
-  `| index | datetime | duration |\n| ----- | -------- | -------- |
+  `${closedAt && firstCommit ? `Lead time for changes ${difference(firstCommit.committedDate, closedAt)}h\n` : ''}| index | datetime | duration |\n| ----- | -------- | -------- |
 ${
     firstCommit
       ? `| First commit | ${
@@ -75,7 +78,8 @@ ${
     closedAt
       ? `| PR closed | ${format(closedAt, datetimeFormat)} | ${closeDuration} |`
       : ""
-  }${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
+  }
+${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
 
 const commentWrapdBody =
   `<!-- pinata: start -->\n${resultBody}\n<!-- pinata: end -->`;
