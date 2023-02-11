@@ -1,58 +1,6 @@
 import { parse } from "https://deno.land/std@0.177.0/flags/mod.ts";
-import {
-  isObject,
-  isString,
-} from "https://deno.land/x/documentaly/utilities/type-guard.ts";
-
-const isValidDate = (date: Date) => !Number.isNaN(date.getTime());
-
-const extractPropFromUnknownJson = <T>(
-  json: unknown,
-  propName: string,
-  nallowing: (x: unknown) => x is T,
-): T | null => {
-  if (!isString(json)) {
-    return null;
-  }
-  const jsonObject = JSON.parse(json);
-
-  if (
-    !isObject(jsonObject) || !(propName in jsonObject) ||
-    !nallowing(jsonObject[propName])
-  ) {
-    return null;
-  }
-
-  return jsonObject[propName] as T;
-};
-
-function validateCommandLineArgument(input: unknown) {
-  if (
-    !isObject(input) || !("_" in input) || !Array.isArray(input._)
-  ) {
-    throw new Error("invalid argument");
-  }
-
-  const body = "body" in input
-    ? extractPropFromUnknownJson(input.body, "body", isString) ?? ""
-    : "";
-  const commits = "commits" in input
-    ? extractPropFromUnknownJson(input.commits, "commits", Array.isArray) ?? []
-    : [];
-  const createdAt = "createdAt" in input
-    ? extractPropFromUnknownJson(input.createdAt, "createdAt", isString) ?? ""
-    : "";
-  const closedAt = "closedAt" in input
-    ? extractPropFromUnknownJson(input.closedAt, "closedAt", isString) ?? ""
-    : "";
-
-  return {
-    body,
-    commits,
-    createdAt: isValidDate(new Date(createdAt)) ? new Date(createdAt) : null,
-    closedAt: isValidDate(new Date(closedAt)) ? new Date(closedAt) : null,
-  };
-}
+import { isObject, isString } from "https://deno.land/x/documentaly/utilities/type-guard.ts";
+import { validateCommandLineArgument } from "./validate-command-line-argument/mod.ts";
 
 function commandLineArgument() {
   return validateCommandLineArgument(parse(Deno.args, {
@@ -65,40 +13,67 @@ function commandLineArgument() {
   }));
 }
 
-const obj = commandLineArgument();
+const {
+  commits,
+  createdAt,
+  closedAt,
+  body,
+  reviews,
+} = commandLineArgument();
 
-console.log(obj.commits[0]);
+function extractFirstCommit(commits: unknown[]) {
+  const [firstCommit] = commits;
+  if (!firstCommit || !isObject(firstCommit)) {
+    return null
+  }
+  if (
+    !('committedDate' in firstCommit) || !isString(firstCommit.committedDate) ||
+    !('authors' in firstCommit) || !Array.isArray(firstCommit.authors)
+  ) {
+    return null
+  }
+  return {
+    committedDate: new Date(firstCommit.committedDate),
+    authors: firstCommit.authors,
+  }
+}
 
-const firstCommitDuration = `h`;
-const approvedDuration = `h`;
+
+const firstCommit = extractFirstCommit(commits)
+
+const createDuration = firstCommit && createdAt ? `${firstCommit.committedDate.getTime() - createdAt?.getTime()}h` : null;
+// const approvedDuration = `h`;
 const closedDuration = `h`;
 
-const resultBody = `
-| index           | datetime                                                | duration               |
-| --------------- | ------------------------------------------------------- | ---------------------- |
-| PR Opened At:   | ${obj.closedAt?.toISOString()}                          | -                      |
-| First Commit At | ${
-  new Date(obj.commits[0].committedDate).toISOString()
-} | ${firstCommitDuration} |
-| Approved At     | ${
-  new Date(obj.commits[0].committedDate).toISOString()
-} | ${approvedDuration}    |
-| PR Closed At    | ${obj.closedAt?.toISOString()}                          | ${closedDuration}      |
 
-First Reviewer:\t${obj.commits[0].authors[0].name}
-`;
+const resultBody = `| index | datetime | duration |\n| ----- | -------- | -------- |
+${firstCommit ? `| First commit | ${firstCommit?.committedDate.toISOString()} | - |` : ""}
+${createdAt ? `| PR opened | ${createdAt?.toISOString()} | ${createDuration} |` : ""}
+${closedAt ? `| PR Closed | ${closedAt?.toISOString()} | ${closedDuration} |` : ""}
+${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
+// | Approved     | ${
+//   new Date(firstCommittedDate).toISOString()
+// } | ${approvedDuration}    |
+
+console.log({
+  firstCommittedAt: firstCommit?.committedDate,
+  createdAt,
+  closedAt,
+  createDuration,
+  resultBody,
+});
 
 const commentWrapdBody =
   `<!-- pinata: start -->\n${resultBody}\n<!-- pinata: end -->`;
 
 const regExp = /<!--\s*pinata:\s*start\s*-->(.*?)<!--\s*pinata:\s*end\s*-->/gms;
 
-if (obj.body?.match(regExp)) {
-  const replacedBody = obj.body?.replace(
+if (body?.match(regExp)) {
+  const replacedBody = body?.replace(
     /<!--\s*pinata:\s*start\s*-->(.*?)<!--\s*pinata:\s*end\s*-->/gms,
     (_, __) => commentWrapdBody,
   );
   console.log(`${replacedBody}`);
 } else {
-  console.log(`${obj.body}\n${commentWrapdBody}`);
+  console.log(`${body}\n${commentWrapdBody}`);
 }
