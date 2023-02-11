@@ -30,25 +30,26 @@ const {
 } = extractFirstAndApproveReview(reviews);
 
 const createDuration = createdAt && firstCommit
-  ? `${createdAt?.getTime() - firstCommit.committedDate.getTime()}h`
+  ? `${(createdAt?.getTime() - firstCommit.committedDate.getTime()) / 1000}s`
   : "-";
 const firstReviewDuration = firstReview && firstCommit
   ? `${
-    firstReview.submittedAt.getTime() - firstCommit.committedDate.getTime()
-  }h`
+    (firstReview.submittedAt.getTime() - firstCommit.committedDate.getTime()) /
+    1000
+  }s`
   : "-";
 const approveDuration = approveReview && (firstReview || firstCommit)
   ? `${
     approveReview.submittedAt.getTime() -
-    (firstReview.submittedAt ?? firstCommit?.committedDate).getTime()
-  }h`
+    ((firstReview.submittedAt ?? firstCommit?.committedDate).getTime()) / 1000
+  }s`
   : "-";
 const closeDuration = closedAt && (approveReview || firstReview || firstCommit)
   ? `${
     closedAt.getTime() -
-    (approveReview?.submittedAt ?? firstReview?.submittedAt ??
-      firstCommit?.committedDate)!.getTime()
-  }h`
+    ((approveReview?.submittedAt ?? firstReview?.submittedAt ??
+        firstCommit?.committedDate)!.getTime()) / 1000
+  }s`
   : "-";
 
 const resultBody =
