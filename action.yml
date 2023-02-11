@@ -4,6 +4,10 @@ description: This repository contains a GitHub Action that transforms cycle time
 branding:
   icon: file-text
   color: orange
+inputs:
+  FORMAT:
+    description: 'Datetime format (default: yyyy-MM-dd hh:mm:ss)'
+    default: yyyy-MM-dd hh:mm:ss
 runs:
   using: composite
   steps:
@@ -51,8 +55,15 @@ runs:
         CLOSED_AT: ${{ env.CLOSED_AT }}
         REVIEWS: ${{ env.REVIEWS }}
       shell: bash
-      run: |
-        deno run -A mod.ts -b "${BODY}" -c "${COMMITS}" -a "${CREATED_AT}" -z "${CLOSED_AT}" -r "${REVIEWS}" > new_body.md
+      run: >
+        deno run -A mod.ts
+        -b "${BODY}"
+        -c "${COMMITS}"
+        -a "${CREATED_AT}"
+        -z "${CLOSED_AT}"
+        -r "${REVIEWS}"
+        -d "${{ inputs.FORMAT }}"
+        > new_body.md
     - name: update body
       env:
         GH_TOKEN: ${{ github.token }}
@@ -60,4 +71,3 @@ runs:
         NEW_BODY: ${{ env.NEW_BODY }}
       shell: bash
       run: gh pr edit ${PR_NUMBER} -F ./new_body.md
-
