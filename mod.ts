@@ -1,8 +1,8 @@
 import {
   difference,
-  format,
 } from "https://deno.land/std@0.177.0/datetime/mod.ts";
 import { commandLineArgument } from "./command-line-argument/mod.ts";
+import { createTable } from "./create-table/mod.ts";
 import { extractFirstAndApproveReview } from "./extruct-approved-at/mod.ts";
 import { extractFirstCommit } from "./extruct-first-commit/mod.ts";
 
@@ -44,42 +44,18 @@ const closeDuration = closedAt && (approveReview || firstReview || firstCommit)
     ).minutes
   }m`
   : "-";
-const resultBody = `${
-  closedAt && firstCommit
-    ? `Lead time for changes ${
-      (difference(firstCommit.committedDate, closedAt).minutes ?? 0) / 60
-    }h\n`
-    : ""
-}| index | datetime | duration |\n| ----- | -------- | -------- |\n${
-  firstCommit
-    ? `| First commit | ${
-      format(firstCommit.committedDate, datetimeFormat)
-    } | - |\n`
-    : ""
-}${
-  createdAt
-    ? `| PR opened | ${
-      format(createdAt, datetimeFormat)
-    } | ${createDuration} |\n`
-    : ""
-}${
-  firstReview
-    ? `| PR first review | ${
-      format(firstReview.submittedAt, datetimeFormat)
-    } | ${firstReviewDuration} |\n`
-    : ""
-}${
-  approveReview
-    ? `| PR approved | ${
-      format(approveReview.submittedAt, datetimeFormat)
-    } | ${approveDuration} |\n`
-    : ""
-}${
-  closedAt
-    ? `| PR closed | ${format(closedAt, datetimeFormat)} | ${closeDuration} |\n`
-    : ""
-}
-${firstCommit ? `First Reviewer:\t${firstCommit?.authors[0].name}` : ""}`;
+
+const resultBody = createTable(datetimeFormat, {
+  firstCommittedAt: firstCommit?.committedDate ?? null,
+  createdAt,
+  createDuration,
+  firstReviewSubmittedAt: firstReview?.submittedAt ?? null,
+  firstReviewDuration,
+  approveReviewSubmittedAt: approveReview?.submittedAt ?? null,
+  approveDuration,
+  closedAt,
+  closeDuration
+})
 
 const commentWrapdBody =
   `<!-- pinata: start -->\n${resultBody}\n<!-- pinata: end -->`;
