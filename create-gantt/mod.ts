@@ -22,7 +22,7 @@ function round(value: number, digits = 2) {
 }
 
 const dateFormat = "yyyy-MM-dd HH:mm:ss";
-const axisFormat = "%H:%M";
+const axisFormat = "%a %H:%M";
 
 function createGantt(
   datetimeFormat: string,

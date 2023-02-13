@@ -23,19 +23,19 @@ const {
 const createDuration = createdAt && firstCommit
   ? difference(firstCommit.committedDate, createdAt)
   : null;
-const firstReviewDuration = (firstReview || closedAt) && firstCommit
-  ? difference(firstCommit.committedDate, firstReview?.submittedAt ?? closedAt!)
+const firstReviewDuration = (firstReview || closedAt) && createdAt
+  ? difference(createdAt, firstReview?.submittedAt ?? closedAt!)
   : null;
-const approveDuration = approveReview && (firstReview || firstCommit)
+const approveDuration =
+  (approveReview || closedAt) && (firstReview || createdAt)
+    ? difference(
+      firstReview?.submittedAt ?? createdAt!,
+      approveReview?.submittedAt ?? closedAt!,
+    )
+    : null;
+const closeDuration = closedAt && (approveReview || firstReview || createdAt)
   ? difference(
-    firstReview?.submittedAt ?? firstCommit!.committedDate,
-    approveReview.submittedAt,
-  )
-  : null;
-const closeDuration = closedAt && (approveReview || firstReview || firstCommit)
-  ? difference(
-    approveReview?.submittedAt ?? firstReview?.submittedAt ??
-      firstCommit!.committedDate,
+    approveReview?.submittedAt ?? firstReview?.submittedAt ?? createdAt!,
     closedAt,
   )
   : null;
@@ -64,7 +64,7 @@ const table = createTable(datetimeFormat, {
   closeDuration,
 });
 
-const commentWrapdBody =`
+const commentWrapdBody = `
 <!-- pinata: start -->
 
 ${gantt}
