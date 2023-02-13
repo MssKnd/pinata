@@ -20,17 +20,18 @@ const {
   approveReview,
 } = extractFirstAndApproveReview(reviews);
 
+const current = new Date();
 const createDuration = createdAt && firstCommit
   ? difference(firstCommit.committedDate, createdAt)
   : null;
 const firstReviewDuration = (firstReview || closedAt) && createdAt
-  ? difference(createdAt, firstReview?.submittedAt ?? closedAt!)
+  ? difference(createdAt, firstReview?.submittedAt ?? closedAt ?? current)
   : null;
 const approveDuration =
   (approveReview || closedAt) && (firstReview || createdAt)
     ? difference(
       firstReview?.submittedAt ?? createdAt!,
-      approveReview?.submittedAt ?? closedAt!,
+      approveReview?.submittedAt ?? closedAt ?? current,
     )
     : null;
 const closeDuration = closedAt && (approveReview || firstReview || createdAt)
