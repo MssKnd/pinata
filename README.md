@@ -22,5 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: pinata
+        env:
+          TZ: 'Asia/Tokyo' # set your timezone
         uses: mssknd/pinata@main
 ```
