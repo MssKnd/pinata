@@ -6,7 +6,6 @@ pull request into a colorful and easily understandable chart. Simplify your pull
 request analysis and make data-driven decisions with ease. Time to take your PR
 process to the next level!
 
-
 # Usage
 
 ```yaml
