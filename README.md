@@ -6,7 +6,6 @@ pull request into a colorful and easily understandable chart. Simplify your pull
 request analysis and make data-driven decisions with ease. Time to take your PR
 process to the next level!
 
-
 # Usage
 
 ```yaml
@@ -23,5 +22,7 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: pinata
+        env:
+          TZ: 'Asia/Tokyo' # set your timezone
         uses: mssknd/pinata@main
 ```
