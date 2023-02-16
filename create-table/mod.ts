@@ -5,15 +5,15 @@ import {
 } from "https://deno.land/std@0.177.0/datetime/mod.ts";
 
 type Datetimes = {
-  firstCommittedAt: Date | null;
-  createdAt: Date | null;
-  createDuration: Partial<Record<Unit, number>> | null;
-  firstReviewSubmittedAt: Date | null;
-  firstReviewDuration: Partial<Record<Unit, number>> | null;
-  approveReviewSubmittedAt: Date | null;
-  approveDuration: Partial<Record<Unit, number>> | null;
-  closedAt: Date | null;
-  closeDuration: Partial<Record<Unit, number>> | null;
+  firstCommittedAt: Date;
+  createdAt: Date;
+  createDuration: Partial<Record<Unit, number>>;
+  firstReviewSubmittedAt?: Date;
+  firstReviewOrCloseDuration?: Partial<Record<Unit, number>>;
+  approveReviewSubmittedAt?: Date;
+  approveDuration?: Partial<Record<Unit, number>>;
+  closedAt?: Date;
+  closeDuration?: Partial<Record<Unit, number>>;
 };
 
 function round(value: number, digits = 2) {
@@ -28,7 +28,7 @@ function createTable(
     createdAt,
     createDuration,
     firstReviewSubmittedAt,
-    firstReviewDuration,
+    firstReviewOrCloseDuration,
     approveReviewSubmittedAt,
     approveDuration,
     closedAt,
@@ -55,7 +55,7 @@ function createTable(
     firstReviewSubmittedAt
       ? `| PR first review | ${
         format(firstReviewSubmittedAt, datetimeFormat)
-      } | ${firstReviewDuration?.minutes}m |\n`
+      } | ${firstReviewOrCloseDuration?.minutes}m |\n`
       : ""
   }${
     approveReviewSubmittedAt

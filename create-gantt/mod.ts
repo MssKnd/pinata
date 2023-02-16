@@ -1,19 +1,15 @@
-import {
-  difference,
-  format,
-  Unit,
-} from "https://deno.land/std@0.177.0/datetime/mod.ts";
+import { difference, format, Unit } from "../deps.ts";
 
-type Datetimes = {
-  firstCommittedAt: Date | null;
-  createdAt: Date | null;
-  createDuration: Partial<Record<Unit, number>> | null;
-  firstReviewSubmittedAt: Date | null;
-  firstReviewDuration: Partial<Record<Unit, number>> | null;
-  approveReviewSubmittedAt: Date | null;
-  approveDuration: Partial<Record<Unit, number>> | null;
-  closedAt: Date | null;
-  closeDuration: Partial<Record<Unit, number>> | null;
+type CreateGanttProps = {
+  firstCommittedAt: Date;
+  createdAt: Date;
+  createDuration: Partial<Record<Unit, number>>;
+  firstReviewSubmittedAt?: Date;
+  firstReviewOrCloseDuration?: Partial<Record<Unit, number>>;
+  approveReviewSubmittedAt?: Date;
+  approveDuration?: Partial<Record<Unit, number>>;
+  closedAt?: Date;
+  closeDuration?: Partial<Record<Unit, number>>;
 };
 
 function round(value: number, digits = 2) {
@@ -25,18 +21,17 @@ const dateFormat = "yyyy-MM-dd HH:mm:ss";
 const axisFormat = "%a %H:%M";
 
 function createGantt(
-  datetimeFormat: string,
   {
     firstCommittedAt,
     createdAt,
     createDuration,
     firstReviewSubmittedAt,
-    firstReviewDuration,
+    firstReviewOrCloseDuration,
     approveReviewSubmittedAt,
     approveDuration,
     closedAt,
     closeDuration,
-  }: Datetimes,
+  }: CreateGanttProps,
 ) {
   return `\`\`\`mermaid
 gantt
@@ -44,7 +39,7 @@ gantt
     closedAt && firstCommittedAt
       ? `title Lead time for changes ${
         round((difference(firstCommittedAt, closedAt).minutes ?? 0) / 60)
-      }h\n`
+      } h\n`
       : ""
   }  dateFormat ${dateFormat}
   axisFormat ${axisFormat}
@@ -58,8 +53,8 @@ gantt
   }${
     createdAt
       ? `\n  ${
-        round((firstReviewDuration?.minutes ?? 0) / 60)
-      } h     :a2, after a1, ${firstReviewDuration?.seconds}s`
+        round((firstReviewOrCloseDuration?.minutes ?? 0) / 60)
+      } h     :a2, after a1, ${firstReviewOrCloseDuration?.seconds}s`
       : ""
   }${
     firstReviewSubmittedAt

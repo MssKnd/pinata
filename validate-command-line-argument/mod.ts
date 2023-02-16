@@ -10,14 +10,23 @@ function validateCommandLineArgument(input: unknown) {
     throw new Error("invalid argument");
   }
 
+  if (!("createdAt" in input)) {
+    throw new Error("-a (createdAt) argument is required");
+  }
+  const createdAtString =
+    extractPropFromUnknownJson(input.createdAt, "createdAt", isString) ?? "";
+  if (!isValidDate(new Date(createdAtString))) {
+    throw new Error("-a (createdAt) argument is invalid date");
+  }
+
+  if (!("commits" in input)) {
+    throw new Error("-c (commits) argument is required");
+  }
+  const commits =
+    extractPropFromUnknownJson(input.commits, "commits", Array.isArray) ?? [];
+
   const body = "body" in input
     ? extractPropFromUnknownJson(input.body, "body", isString) ?? ""
-    : "";
-  const commits = "commits" in input
-    ? extractPropFromUnknownJson(input.commits, "commits", Array.isArray) ?? []
-    : [];
-  const createdAt = "createdAt" in input
-    ? extractPropFromUnknownJson(input.createdAt, "createdAt", isString) ?? ""
     : "";
   const closedAt = "closedAt" in input
     ? extractPropFromUnknownJson(input.closedAt, "closedAt", isString) ?? ""
@@ -33,8 +42,8 @@ function validateCommandLineArgument(input: unknown) {
   return {
     body,
     commits,
-    createdAt: isValidDate(new Date(createdAt)) ? new Date(createdAt) : null,
-    closedAt: isValidDate(new Date(closedAt)) ? new Date(closedAt) : null,
+    createdAt: new Date(createdAtString),
+    closedAt: isValidDate(new Date(closedAt)) ? new Date(closedAt) : undefined,
     reviews,
     datetimeFormat,
   };

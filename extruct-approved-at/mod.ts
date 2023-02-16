@@ -26,8 +26,8 @@ function isApproveReview(review: Review) {
 function extractFirstAndApproveReview(inputs: unknown[]) {
   if (!Array.isArray(inputs) || inputs.length === 0) {
     return {
-      firstReview: null,
-      approveReview: null,
+      firstReview: undefined,
+      approveReview: undefined,
     };
   }
   const reviews = inputs.map(validateReview);
@@ -35,7 +35,7 @@ function extractFirstAndApproveReview(inputs: unknown[]) {
   const [firstApproveReview] = approveReviews;
   return {
     firstReview: reviews[0],
-    approveReview: firstApproveReview ?? null,
+    approveReview: firstApproveReview ?? undefined,
   };
 }
 
