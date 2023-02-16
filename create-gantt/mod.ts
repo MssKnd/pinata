@@ -1,8 +1,4 @@
-import {
-  difference,
-  format,
-  Unit,
-} from "../deps.ts";
+import { difference, format, Unit } from "../deps.ts";
 
 type CreateGanttProps = {
   firstCommittedAt: Date;
