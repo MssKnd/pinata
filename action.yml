@@ -49,7 +49,7 @@ runs:
         deno-version: v1.x
     - name: install pinata
       shell: bash
-      run: deno install -A --name pinata https://deno.land/x/pinata
+      run: deno install -A --name pinata https://deno.land/x/pinata/mod.ts
     - name: create new body
       env: 
         BODY: ${{ env.BODY }}
