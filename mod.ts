@@ -65,8 +65,7 @@ const table = createTable(datetimeFormat, {
   closeDuration,
 });
 
-const commentWrapdBody = `
-<!-- pinata: start -->
+const commentWrapdBody = `<!-- pinata: start -->
 
 ${gantt}
 

@@ -44,7 +44,7 @@ gantt
     closedAt && firstCommittedAt
       ? `title Lead time for changes ${
         round((difference(firstCommittedAt, closedAt).minutes ?? 0) / 60)
-      }h\n`
+      } h\n`
       : ""
   }  dateFormat ${dateFormat}
   axisFormat ${axisFormat}
