@@ -2,9 +2,9 @@ import {
   difference,
   format,
   Unit,
-} from "https://deno.land/std@0.177.0/datetime/mod.ts";
+} from "../deps.ts";
 
-type Datetimes = {
+type CreateGanttProps = {
   firstCommittedAt: Date;
   createdAt: Date;
   createDuration: Partial<Record<Unit, number>>;
@@ -25,7 +25,6 @@ const dateFormat = "yyyy-MM-dd HH:mm:ss";
 const axisFormat = "%a %H:%M";
 
 function createGantt(
-  datetimeFormat: string,
   {
     firstCommittedAt,
     createdAt,
@@ -36,7 +35,7 @@ function createGantt(
     approveDuration,
     closedAt,
     closeDuration,
-  }: Datetimes,
+  }: CreateGanttProps,
 ) {
   return `\`\`\`mermaid
 gantt

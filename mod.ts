@@ -33,7 +33,7 @@ const {
   closedAt,
 });
 
-const gantt = createGantt(datetimeFormat, {
+const gantt = createGantt({
   firstCommittedAt: firstCommit?.committedDate,
   createdAt,
   createDuration,

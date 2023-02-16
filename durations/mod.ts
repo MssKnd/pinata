@@ -1,4 +1,4 @@
-import { difference } from "https://deno.land/std@0.177.0/datetime/mod.ts";
+import { difference } from "../deps.ts";
 
 type DurationProps = {
   createdAt: Date;
