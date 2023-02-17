@@ -41,7 +41,7 @@ gantt
         round((difference(firstCommittedAt, closedAt).minutes ?? 0) / 60)
       } h\n`
       : ""
-  }  dateFormat ${dateFormat}
+  }dateFormat ${dateFormat}
   axisFormat ${axisFormat}
   excludes weekends
   ${
