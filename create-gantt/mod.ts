@@ -7,7 +7,7 @@ type CreateGanttProps = {
   firstReviewSubmittedAt?: Date;
   firstReviewOrCloseDuration?: Partial<Record<Unit, number>>;
   approveReviewSubmittedAt?: Date;
-  approveDuration?: Partial<Record<Unit, number>>;
+  approveOrCloseDuration?: Partial<Record<Unit, number>>;
   closedAt?: Date;
   closeDuration?: Partial<Record<Unit, number>>;
 };
@@ -28,7 +28,7 @@ function createGantt(
     firstReviewSubmittedAt,
     firstReviewOrCloseDuration,
     approveReviewSubmittedAt,
-    approveDuration,
+    approveOrCloseDuration,
     closedAt,
     closeDuration,
   }: CreateGanttProps,
@@ -59,8 +59,8 @@ gantt
   }${
     firstReviewSubmittedAt
       ? `\n  ${
-        round((approveDuration?.minutes ?? 0) / 60)
-      } h     :a3, after a2, ${approveDuration?.seconds}s`
+        round((approveOrCloseDuration?.minutes ?? 0) / 60)
+      } h     :a3, after a2, ${approveOrCloseDuration?.seconds}s`
       : ""
   }${
     approveReviewSubmittedAt
