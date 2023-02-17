@@ -23,10 +23,9 @@ function durations(
     !firstReviewSubmittedAt && approveReviewSubmittedAt
       ? undefined
       : difference(createdAt, firstReviewSubmittedAt ?? closedAt ?? current);
-  const approveDuration = (approveReviewSubmittedAt || closedAt) &&
-      firstReviewSubmittedAt
+  const approveOrCloseDuration = firstReviewSubmittedAt
     ? difference(
-      firstReviewSubmittedAt ?? createdAt!,
+      firstReviewSubmittedAt,
       approveReviewSubmittedAt ?? current,
     )
     : undefined;
@@ -40,7 +39,7 @@ function durations(
   return {
     createDuration,
     firstReviewOrCloseDuration,
-    approveDuration,
+    approveOrCloseDuration,
     closeDuration,
   };
 }

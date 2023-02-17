@@ -23,7 +23,7 @@ const {
 const {
   createDuration,
   firstReviewOrCloseDuration,
-  approveDuration,
+  approveOrCloseDuration,
   closeDuration,
 } = durations({
   createdAt,
@@ -40,7 +40,7 @@ const gantt = createGantt({
   firstReviewSubmittedAt: firstReview?.submittedAt,
   firstReviewOrCloseDuration,
   approveReviewSubmittedAt: approveReview?.submittedAt,
-  approveDuration,
+  approveOrCloseDuration,
   closedAt,
   closeDuration,
 });
@@ -52,7 +52,7 @@ const table = createTable(datetimeFormat, {
   firstReviewSubmittedAt: firstReview?.submittedAt,
   firstReviewOrCloseDuration,
   approveReviewSubmittedAt: approveReview?.submittedAt,
-  approveDuration,
+  approveOrCloseDuration,
   closedAt,
   closeDuration,
 });

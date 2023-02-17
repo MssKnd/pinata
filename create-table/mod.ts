@@ -11,7 +11,7 @@ type Datetimes = {
   firstReviewSubmittedAt?: Date;
   firstReviewOrCloseDuration?: Partial<Record<Unit, number>>;
   approveReviewSubmittedAt?: Date;
-  approveDuration?: Partial<Record<Unit, number>>;
+  approveOrCloseDuration?: Partial<Record<Unit, number>>;
   closedAt?: Date;
   closeDuration?: Partial<Record<Unit, number>>;
 };
@@ -30,7 +30,7 @@ function createTable(
     firstReviewSubmittedAt,
     firstReviewOrCloseDuration,
     approveReviewSubmittedAt,
-    approveDuration,
+    approveOrCloseDuration,
     closedAt,
     closeDuration,
   }: Datetimes,
@@ -61,7 +61,7 @@ function createTable(
     approveReviewSubmittedAt
       ? `| PR approved | ${
         format(approveReviewSubmittedAt, datetimeFormat)
-      } | ${approveDuration?.minutes}m |\n`
+      } | ${approveOrCloseDuration?.minutes}m |\n`
       : ""
   }${
     closedAt
