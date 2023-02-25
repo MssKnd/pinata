@@ -1,4 +1,4 @@
-import { parse } from "https://deno.land/std@0.177.0/flags/mod.ts";
+import { parse } from "https://deno.land/std@0.178.0/flags/mod.ts";
 import { validateCommandLineArgument } from "../validate-command-line-argument/mod.ts";
 
 function commandLineArgument() {
